@@ -3,23 +3,9 @@
 """
     Template for the project kmap.
     
-    NAME: Name of the module/tool
+    NAME: Name of the module
     
-    DESCRIPTION: Description of the module/tool
-    
-    If developing a command-line tool specify the arguments and options
-    
-    SYNOPSIS:
-    
-    python tool.py FILE [OPTIONS]
-    
-    OPTIONS:
-
-    -v/--verbose: Prints more information
-
-    OUTPUT:
-    
-    File with the results.
+    DESCRIPTION: Description of the module
 
 """
 
