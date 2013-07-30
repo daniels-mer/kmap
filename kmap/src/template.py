@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-    Template for the project kmap.
+    :mod:`template` -- Template for python modules
+    ===================================
     
-    NAME: Name of the module
+    .. module:: src.template
+          :synopsis: template for python modules.
+    .. moduleauthor:: Daniel Santonja
+        
+    :License (URL), 
     
-    DESCRIPTION: Description of the module
-
+    :Date last change:
+    
+    :Version:
 """
 
 # IMPORTS
@@ -16,32 +22,34 @@
 
 # INTERNAL FUNCTIONS
 
-def __private_function(self, param):
+def __private_function(param):
     """
-        Function description
+        ..function :: __private_function(param)
         
-        @param param: Parameter description.
-        @type param: Parameter type.
+        Description of the function
+        :param param: Parameter description.
+        :type param: Parameter type.
         
-        @return: Return value.
-        @rtype: Return type.
+        :returns: Return value
+        :rtype: Return type.
                 
-        @raise error: If the function raises an exception.
+        :raises: If the function raises an exception.
     """
 
 # PUBLIC FUNCTIONS
 
 def function(self, param):
     """
-        Function description
+        ..function :: function(param)
         
-        @param param: Parameter description.
-        @type param: Parameter type.
+        Description of the function
+        :param param: Parameter description.
+        :type param: Parameter type.
         
-        @return: Return value.
-        @rtype: Return type.
-        
-        @raise error: If the function raises an exception.
+        :returns: Return value
+        :rtype: Return type.
+                
+        :raises: If the function raises an exception
     """
 
 
@@ -51,22 +59,26 @@ def function(self, param):
 
 class FirstClass:
     """
+        ..class:: FirstClass
+        
         Class description
     """
 
-    def __init__(self, param):
+    def __init__(self, param, optional=None):
         """
-            Instantiation  function
+            ..method::__init__(param [, optional])
+            Instantiation method
             
-            @param param: Parameter description.
-            @type param: Parameter type.
+            :param param: Parameter description.
+            :type param: Parameter type.
+            :param optional: Parameter description.
+            :type optional: Parameter type.
         """
         # INSTANCE VARIABLES
         self.param = param
 
         """
-            @ivar: Instance variable description.
-            @type: Instance variable type.
+            ..attribute: Instance variable description.
         """
         self.dict = {}
         
@@ -74,49 +86,53 @@ class FirstClass:
     # PUBLIC METHODS
     def method(self, param1):
         """
-            Function description
-        
-            @param param: Parameter description.
-            @type param: Parameter type.
+            ..method::method(param1)
             
-            @return: Return value.
-            @rtype: Return type.
+            Method description
             
-            @raise error: If the function raises an exception.
+            :param param1: Parameter description.
+            :type param1: Parameter type.
+            
+            :returns: Return value
+            :rtype: Return type.
+            
+            :raises: If the function raises an exception.
         """
 
     # INTERNAL FUNCTIONS
     def __private_method(self, param1):
         """
-           Function description
-        
-            @param param: Parameter description.
-            @type param: Parameter type.
+           ..method::__private_method(param1)
             
-            @return: Return value.
-            @rtype: Return type.
+            Method description
             
-            @raise error: If the function raises an exception.
+            :param param1: Parameter description.
+            :type param1: Parameter type.
+            
+            :returns: Return value
+            :rtype: Return type.
+            
+            :raises: If the function raises an exception.
         """
-
-
-
 
 
 # EXCEPTION CLASS
 
 class CustomError(Exception):
     """
+        ..exception:CustomError
+        
         Exception class description
     """
     
     
     def __init__(self, param):
         """
-            Instantiation  function
-
-            @param param: Parameter description.
-            @type param: Parameter type.
+            ..method::__init__(param)
+            Instantiation method
+            
+            :param param: Parameter description.
+            :type param: Parameter type.
         """
         self.param = param
     
