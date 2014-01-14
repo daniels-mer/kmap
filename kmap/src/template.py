@@ -8,7 +8,7 @@
           :synopsis: template for python modules.
     .. moduleauthor:: Daniel Santonja
         
-    :License (URL), 
+    :License: GPL (https://gnu.org/licenses/gpl.html)
     
     :Date last change:
     
