@@ -2,3 +2,6 @@
 *.db
 *.project
 *.pydevproject
+org.eclipse.core.resources.prefs
+*~
+
