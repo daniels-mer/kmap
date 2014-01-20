@@ -26,6 +26,7 @@ class Concept(models.NodeModel):
     label = models.StringProperty(unique=True, indexed=True)
     description = models.StringProperty()
 
-    neighbour = models.Relationship('self', rel_type='neighbour')
+    links = models.Relationship('self', rel_type='links')
+ 
     
 
