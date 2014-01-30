@@ -16,6 +16,7 @@
 """
 import sys
 from tastypie.resources import Resource
+from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
 from tastypie import fields
 from kmap.models import Concept
@@ -32,6 +33,8 @@ class ConceptResource(Resource):
     class Meta:
         resource_name = 'concept'
         object_class = Concept
+        authorization = Authorization()
+        
         
     
     # The following methods will need overriding regardless of your
@@ -52,18 +55,16 @@ class ConceptResource(Resource):
         """
         kwargs = {}
         
-#         if isinstance(bundle_or_obj, Bundle):
-#             bool(bundle_or_obj.obj)
-#             kwargs['pk'] = bundle_or_obj.obj.label
-#         else:
-#             kwargs['pk'] = bundle_or_obj[0].label
+        if isinstance(bundle_or_obj, Bundle):
+            bool(bundle_or_obj.obj)
+            kwargs['pk'] = bundle_or_obj.obj.label
+        else:
+            kwargs['pk'] = bundle_or_obj[0].label
         
 #         if isinstance(bundle_or_obj, Bundle):
 #             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj.obj, self._meta.detail_uri_name)
 #         else:
 #             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj, self._meta.detail_uri_name)
-        kwargs['pk'] = "physics"
-        sys.stderr.write("detail_uri_kwargs is called\n")
         return kwargs
 
     def get_object_list(self, request):
@@ -83,10 +84,11 @@ class ConceptResource(Resource):
         results = Concept.objects.all()
 
         return results
-
+    
     def obj_get_list(self, bundle, **kwargs):
         # Calls apply_filters that calls to get_object_list skipped in this 
         # prototype. Then calls for authorization, skipped too.
+        sys.stderr.write("obj_get_list is called\n")
         return self.get_object_list(bundle.request)
 
     def obj_get(self, bundle, **kwargs):
@@ -109,7 +111,6 @@ class ConceptResource(Resource):
                                              description=bundle.obj.desciption)
         
         new_concept.save()
-        
         return bundle
 
     def obj_update(self, bundle, **kwargs):
