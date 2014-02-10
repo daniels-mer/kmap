@@ -26,7 +26,30 @@ class Concept(models.NodeModel):
     label = models.StringProperty(unique=True, indexed=True)
     description = models.StringProperty()
 
-    links = models.Relationship('self', rel_type='links')
+#     links = models.Relationship('Link', rel_type='links')
+#     
+    def nodelinks(self, link_type=None):
+        if link_type:
+            return [link.opposite(self.label) for link in self.links.all() if link.type==link_type]
+        else:
+            return [link.opposite(self.label) for link in self.links.all()]
+            
  
+class Link(models.NodeModel):
+    """
+        ..class:: Link
+
+        This class is a workaround to provide flexible links in neo4django, 
+        it connects 2 nodes
+    """
+    type = models.StringProperty(unique=False, indexed=True)
+
+    concepts = models.Relationship('Concept', rel_type='concepts', related_name="links")
     
+    def opposite(self, label):
+        if self.concepts.all()[0].label == label:
+            return self.concepts.all()[1]
+        else:
+            return self.concepts.all()[0]
+        
 
