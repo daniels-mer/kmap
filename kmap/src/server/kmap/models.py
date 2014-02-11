@@ -51,5 +51,7 @@ class Link(models.NodeModel):
             return self.concepts.all()[1]
         else:
             return self.concepts.all()[0]
-        
+    
+    def __str__(self):
+        return "%s <- %s ->%s"(self.concepts[0], self.type, self.concepts[1])
 

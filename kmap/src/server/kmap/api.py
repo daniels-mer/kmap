@@ -133,6 +133,13 @@ class ConceptResource(Resource):
     def rollback(self, bundles):
         pass
     
+    def dehydrate(self, bundle):
+        links = []
+        concept = Concept.objects.get(label=bundle.data["label"])
+        for link in concept.links.all():
+            links.append({"type":link.type, "label":link.opposite(bundle.data["label"]).label})
+        bundle.data["links"] = links
+        return bundle
     
 class LinkResource(Resource):
     # Just like a Django ``Form`` or ``Model``, we're defining all the
