@@ -26,6 +26,7 @@ from neo4django.db import models
 class ConceptResource(Resource):
     # Just like a Django ``Form`` or ``Model``, we're defining all the
     # fields we're going to handle with the API here.
+    
     label = fields.CharField(attribute='label', unique=True)
     description = fields.CharField(attribute='description', null=True)
 
@@ -144,6 +145,8 @@ class ConceptResource(Resource):
 class LinkResource(Resource):
     # Just like a Django ``Form`` or ``Model``, we're defining all the
     # fields we're going to handle with the API here.
+#     id = fields.IntegerField(attribute='id', unique=True)
+    
     link_type = fields.CharField(attribute='type', unique=False)
 
     concepts = fields.ToManyField(to='kmap.api.ConceptResource', attribute="concepts", null=True, blank=True)
@@ -247,3 +250,10 @@ class LinkResource(Resource):
     def rollback(self, bundles):
         pass
 
+    def dehydrate_concepts(self, bundle):
+        concepts = []
+        for key in bundle.data:
+            sys.stderr.write(str(bundle.data[key])+"\n")
+        return bundle
+    
+        

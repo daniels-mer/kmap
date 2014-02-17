@@ -42,6 +42,8 @@ class Link(models.NodeModel):
         This class is a workaround to provide flexible links in neo4django, 
         it connects 2 nodes
     """
+#     id = models.IntegerProperty(unique=True, indexed=True)
+    
     type = models.StringProperty(unique=False, indexed=True)
 
     concepts = models.Relationship('Concept', rel_type='concepts', related_name="links")
