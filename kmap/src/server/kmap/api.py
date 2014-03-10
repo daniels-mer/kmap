@@ -15,9 +15,11 @@
     :Version:
 """
 import sys
+from django.core.exceptions import ObjectDoesNotExist
 from tastypie.resources import Resource
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
+from tastypie.exceptions import NotFound
 from tastypie import fields
 from kmap.models import Concept, Link
 from kmap.serializers import ConceptJSONSerializer
@@ -29,8 +31,10 @@ class ConceptResource(Resource):
     
     label = fields.CharField(attribute='label', unique=True)
     description = fields.CharField(attribute='description', null=True)
-
+    weight = fields.IntegerField(attribute='weight', null=True, default=1)
+    
     links = fields.ToManyField(to='kmap.api.LinkResource', attribute="links", null=True, blank=True)
+    
 
     class Meta:
         resource_name = 'concept'
@@ -137,6 +141,7 @@ class ConceptResource(Resource):
     def dehydrate(self, bundle):
         links = []
         concept = Concept.objects.get(label=bundle.data["label"])
+        sys.stderr.write(str(concept.links.all()))
         for link in concept.links.all():
             links.append({"type":link.type, "label":link.opposite(bundle.data["label"]).label})
         bundle.data["links"] = links
@@ -148,7 +153,8 @@ class LinkResource(Resource):
 #     id = fields.IntegerField(attribute='id', unique=True)
     
     link_type = fields.CharField(attribute='type', unique=False)
-
+    weight = fields.IntegerField(attribute='weight', null=True, default=1)
+    
     concepts = fields.ToManyField(to='kmap.api.ConceptResource', attribute="concepts", null=True, blank=True)
 
     class Meta:
@@ -178,9 +184,9 @@ class LinkResource(Resource):
         
         if isinstance(bundle_or_obj, Bundle):
             bool(bundle_or_obj.obj)
-            kwargs['pk'] = bundle_or_obj.obj.type
+            kwargs['pk'] = bundle_or_obj.obj.id
         else:
-            kwargs['pk'] = bundle_or_obj[0].type
+            kwargs['pk'] = bundle_or_obj[0].id
         
 #         if isinstance(bundle_or_obj, Bundle):
 #             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj.obj, self._meta.detail_uri_name)
@@ -213,7 +219,13 @@ class LinkResource(Resource):
         return self.get_object_list(bundle.request)
 
     def obj_get(self, bundle, **kwargs):
-        #Beacause there are no "unique" link it returns a list
+        sys.stderr.write("obj_get is called\n")
+        id = kwargs['pk']
+        sys.stderr.write("obj_get is called label:%s\n"%str(id))
+        resource = Link.objects.filter(id=id)
+        sys.stderr.write("obj_get is called resource:%s\n"%type(resource))
+        sys.stderr.write("obj_get is called prueba %s\n"% type(self._meta.object_class()))
+        return resource[0]
         return self.get_object_list(bundle.request)
         
     def obj_create(self, bundle, **kwargs):
@@ -243,14 +255,16 @@ class LinkResource(Resource):
 
 
     def obj_delete(self, bundle, **kwargs):
-        result = Concept.objects.filter(label=kwargs['pk'])
-
-        result.delete()
-
+        try:
+            result = Link.objects.get(id=kwargs['pk'])        
+            result.delete()
+        except ObjectDoesNotExist:
+            raise NotFound
+        
     def rollback(self, bundles):
         pass
 
-    def dehydrate_concepts(self, bundle):
+    def dehydrate(self, bundle):
         concepts = []
         for key in bundle.data:
             sys.stderr.write(str(bundle.data[key])+"\n")

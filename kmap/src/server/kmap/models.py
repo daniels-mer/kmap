@@ -25,6 +25,7 @@ class Concept(models.NodeModel):
     """
     label = models.StringProperty(unique=True, indexed=True)
     description = models.StringProperty()
+    weight = models.IntegerProperty(unique=False, null=True, default=1)
 
 #     links = models.Relationship('Link', rel_type='links')
 #     
@@ -33,8 +34,8 @@ class Concept(models.NodeModel):
             return [link.opposite(self.label) for link in self.links.all() if link.type==link_type]
         else:
             return [link.opposite(self.label) for link in self.links.all()]
-            
- 
+
+
 class Link(models.NodeModel):
     """
         ..class:: Link
@@ -43,17 +44,21 @@ class Link(models.NodeModel):
         it connects 2 nodes
     """
 #     id = models.IntegerProperty(unique=True, indexed=True)
-    
+
     type = models.StringProperty(unique=False, indexed=True)
 
     concepts = models.Relationship('Concept', rel_type='concepts', related_name="links")
+    weight = models.IntegerProperty(unique=False, null=True, default=1)
     
     def opposite(self, label):
         if self.concepts.all()[0].label == label:
             return self.concepts.all()[1]
         else:
             return self.concepts.all()[0]
-    
+
     def __str__(self):
-        return "%s <- %s ->%s"(self.concepts[0], self.type, self.concepts[1])
+        if self.concepts.all() == 2:
+            return "%s <- %s ->%s"(self.concepts.all()[0], self.type, self.concepts.all()[1])
+        else:
+            return "id:%d\t type:%s" % (self.id, self.type)
 
