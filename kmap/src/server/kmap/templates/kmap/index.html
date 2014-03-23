@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {%include "kmap/utils/standard_head.html"%}
+    <title></title>
+</head>
+<body>
+    
+    <div class="wrapper">
+	    <div id="title">
+	    <h2>Welcome to Kmap, choose one option:</h2>
+	    </div>
+        <div id="buttons">
+        <form action="{%url 'navigate'%}" method="GET">
+            <button>Navigate</button>
+        </form>
+        
+        <form action="{%url 'learn'%}" method="GET">
+            <button>Learn</button>
+        </form>
+        </div> 
+    </div>
+</body>
+</html>
+
+
