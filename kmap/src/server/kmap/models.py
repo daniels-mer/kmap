@@ -29,7 +29,7 @@ class Concept(models.NodeModel):
 
 #     links = models.Relationship('Link', rel_type='links')
 #     
-    def node_links(self, link_type=None):
+    def nodelinks(self, link_type=None):
         if link_type:
             return [link.opposite(self.label) for link in self.links.all() if link.type==link_type]
         else:

@@ -5,7 +5,7 @@
         var ctx = canvas.getContext("2d");
         var particleSystem
         ctx.font="10px Georgia";
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = 'LavenderBlush';
         nodes_ready=true
 
         var that = {
@@ -39,7 +39,7 @@
                 // x,y point in the screen's coordinate system
 
                 if (nodes_ready){
-                    ctx.fillStyle = "white"
+                    ctx.fillStyle = "Cornsilk"
                     ctx.fillRect(0,0, canvas.width, canvas.height)
 
                     particleSystem.eachEdge(function(edge, pt1, pt2){
@@ -54,6 +54,9 @@
                         ctx.moveTo(pt1.x, pt1.y)
                         ctx.lineTo(pt2.x, pt2.y)
                         ctx.stroke()
+                        ctx.fillStyle = 'black';
+                        console.out(edge)
+                        ctx.fillText(edge.data["type"],((pt1.x+pt2.x)/2) + 10,(pt1.y+pt2.y)/2 + 15);
                     })
 
                     particleSystem.eachNode(function(node, pt){
@@ -111,13 +114,19 @@
         return that
     }
 
-    $(document).ready(function(){
+    function search(){
         var sys = arbor.ParticleSystem(1000, 600, 0.5) // create the system with sensible repulsion/stiffness/friction
         sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
         sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
+        var root = document.getElementById("search-text").value
+        loadNodes(sys, root)
+    }
 
+    $(document).ready(function(){
+        
+        document.getElementById("search-button").onclick = search;
         // add some nodes to the graph and watch it go...
-        loadNodes(sys, "Physics")
+        
         // or, equivalentl
 
     })
@@ -133,10 +142,18 @@
             dataType: "json",
             success: function(data, response){
                 node_root = system.addNode(data.label, {mass:1.0, fixed:true, description:data.description})
+                for(var i = 0; i<data.links.length; i++){
+                    if(data.links[i].label != ""){
+                        system.addNode(data.links[i].label, {mass:1.0, description:""})
+                        system.addEdge(root, data.links[i].label,{length:0.3,type:data.links[i].type})
+                    }                
+            }
+            var box = document.getElementById("user-box")
+            box.style.display="none"
             }
         })
 
-        $.ajax({
+/*        $.ajax({
             url: "api/v1/concept/?format=json&neighbor="+root,
             context: document.body,
             type:"get",
@@ -156,7 +173,7 @@
                 }
                         
             }
-        })
+        })*/
                         //first For loop create nodes
                         /*
 	  	var node = new Node(label, {mass:1.0, description:description})
@@ -168,3 +185,4 @@
     }
 
 })(this.jQuery)
+

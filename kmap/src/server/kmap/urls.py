@@ -15,5 +15,4 @@ urlpatterns = patterns('',
     url(r'^index.html$', views.index, name='index'),
     url(r'^navigate.html$', views.navigate, name='navigate'),
     url(r'^learn.html$', views.navigate, name='learn'),
-#     (r'^api/', include(v1_api.urls)),
 )

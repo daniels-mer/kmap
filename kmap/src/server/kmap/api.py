@@ -15,6 +15,7 @@
     :Version:
 """
 import sys
+from neo4jrestclient.client import GraphDatabase, Node
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.resources import Resource
 from tastypie.authorization import Authorization
@@ -23,6 +24,7 @@ from tastypie.exceptions import NotFound, BadRequest
 from tastypie import fields
 from kmap.models import Concept, Link
 from kmap.serializers import ConceptJSONSerializer
+from kmap.timer import Timer
 
 class ConceptResource(Resource):
     # Just like a Django ``Form`` or ``Model``, we're defining all the
@@ -86,12 +88,33 @@ class ConceptResource(Resource):
             
         """
         sys.stderr.write("get_object_list is called\n")
-        sys.stderr.write(str(request.GET)+"\n----\n")
         if "neighbor" in request.GET:
-            concept = Concept.objects.filter(label__iexact=request.GET["neighbor"]).select_related(depth=int(request.GET.get("depth", 1)))[0]
-            results = concept.node_links(request.GET.get("type", None))
-            sys.stderr.write("============")
-            sys.stderr.write(str(results)+"\n\n")
+#             with Timer() as t:
+#                 concept = Concept.objects.filter(label__iexact=request.GET["neighbor"]).select_related(depth=int(request.GET.get("depth", 1)))[0]
+#             sys.stderr.write("\Select1: %s s\n"%t.secs)
+#             with Timer() as t:
+#                 results = concept.node_links(request.GET.get("type", None))
+#             sys.stderr.write("\nSelect2: %s s\n"%t.secs)
+#             
+            with Timer() as t:
+                concept = Concept.objects.filter(label__iexact=request.GET["neighbor"])[0]
+
+                results = concept.node_links(request.GET.get("type", None))
+            sys.stderr.write("\nNo-Select: %s s\n"%t.secs)
+            
+#             with Timer() as t:
+#                 gdb = GraphDatabase("http://localhost:7474/db/data/")
+#                 query="""START a = node:`kmap-Concept`(label = "%s")
+#                      MATCH a<-[:concepts]-b-[:concepts]->c
+#                      RETURN b, c;
+#                     """%request.GET["neighbor"]
+#                 data = gdb.query(q=query, returns=(Node, Node))
+#                 for d in data:
+#                     links.append({"type":d[0]["type"], "label":d[1]["label"]})
+#             sys.stderr.write("\nCypher: %s s\n"%t.secs)
+            
+            
+
         else:
             sys.stderr.write("debug0\n")
             results = Concept.objects.all()
@@ -165,10 +188,16 @@ class ConceptResource(Resource):
     
     def dehydrate(self, bundle):
         links = []
-        concept = Concept.objects.get(label=bundle.data["label"])
-        sys.stderr.write(str(concept.links.all()))
-        for link in concept.links.all():
-            links.append({"type":link.type, "label":link.opposite(bundle.data["label"]).label})
+        gdb = GraphDatabase("http://localhost:7474/db/data/")
+        query="""START a = node:`kmap-Concept`(label = "%s")
+                 MATCH a<-[:concepts]-b-[:concepts]->c
+                 RETURN b, c;
+                """%bundle.data["label"]
+        data = gdb.query(q=query, returns=(Node, Node))
+        for d in data:
+            links.append({"type":d[0]["type"], "label":d[1]["label"]})
+
+
         bundle.data["links"] = links
         return bundle
 
@@ -212,7 +241,7 @@ class LinkResource(Resource):
             kwargs['pk'] = bundle_or_obj.obj.id
         else:
             sys.stderr.write(repr(bundle_or_obj))
-            kwargs['pk'] = bundle_or_obj.id
+            kwargs['pk'] = bundle_or_obj[0].id
         
 #         if isinstance(bundle_or_obj, Bundle):
 #             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj.obj, self._meta.detail_uri_name)
@@ -273,7 +302,7 @@ class LinkResource(Resource):
             sys.stderr.write(str(e))
             return BadRequest
         
-        return new_link
+        return bundle
 
     def obj_update(self, bundle, **kwargs):
         #updates an object, needs more coding
