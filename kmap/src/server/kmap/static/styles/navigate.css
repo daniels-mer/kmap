@@ -1,0 +1,38 @@
+#user-box{
+    width:40%;
+    height:20%;
+    position:absolute;
+    left:33%;
+    top:35%;
+    background-color:#b0c4de;
+}
+
+#search-box{
+    width:70%;
+    margin: 0px auto;
+    margin-top: 3%;
+}
+
+#searching-box{
+    display:none;
+}
+
+#error-box{
+    display:none;
+}
+
+#canvas-div{
+    width:70%;
+    height:80%;
+    margin:0px auto;
+    
+}
+
+.wrapper{
+    height:100%;
+}
+
+h2{
+    text-align:center;
+    font-size:20px;
+}
