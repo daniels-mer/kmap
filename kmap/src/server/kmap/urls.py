@@ -1,5 +1,21 @@
-# urls.py
-from django.conf.urls import *
+# -*- coding: utf-8 -*-
+
+"""
+    :mod:`urls` -- 
+    ===================================
+    
+    .. module:: src.server.kmap
+          :synopsis: Defines the url dispatchers .
+    .. moduleauthor:: Daniel Santonja
+        
+    :License: GPL (https://gnu.org/licenses/gpl.html)
+    
+    :Date last change:
+    
+    :Version:
+"""
+
+from django.conf.urls import patterns, url, include
 from kmap.api import ConceptResource, LinkResource
 from tastypie.api import Api
 from kmap import views

@@ -34,7 +34,8 @@ class ConceptResource(Resource):
     description = fields.CharField(attribute='description', null=True)
     weight = fields.IntegerField(attribute='weight', null=True, default=1)
     
-    links = fields.ToManyField(to='kmap.api.LinkResource', attribute="links", null=True, blank=True)
+    links = fields.ToManyField(to='kmap.api.LinkResource', attribute="links", 
+                               null=True, blank=True)
     
 
     class Meta:
@@ -68,10 +69,6 @@ class ConceptResource(Resource):
         else:
             kwargs['pk'] = bundle_or_obj[0].label
         
-#         if isinstance(bundle_or_obj, Bundle):
-#             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj.obj, self._meta.detail_uri_name)
-#         else:
-#             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj, self._meta.detail_uri_name)
         return kwargs
 
     def get_object_list(self, request):
@@ -89,36 +86,16 @@ class ConceptResource(Resource):
         """
         sys.stderr.write("get_object_list is called\n")
         if "neighbor" in request.GET:
-#             with Timer() as t:
-#                 concept = Concept.objects.filter(label__iexact=request.GET["neighbor"]).select_related(depth=int(request.GET.get("depth", 1)))[0]
-#             sys.stderr.write("\Select1: %s s\n"%t.secs)
-#             with Timer() as t:
-#                 results = concept.node_links(request.GET.get("type", None))
-#             sys.stderr.write("\nSelect2: %s s\n"%t.secs)
-#             
-            with Timer() as t:
-                concept = Concept.objects.filter(label__iexact=request.GET["neighbor"])[0]
+            concept = Concept.objects.filter(label__iexact=request.GET["neighbor"])[0]
 
-                results = concept.node_links(request.GET.get("type", None))
-            sys.stderr.write("\nNo-Select: %s s\n"%t.secs)
-            
-#             with Timer() as t:
-#                 gdb = GraphDatabase("http://localhost:7474/db/data/")
-#                 query="""START a = node:`kmap-Concept`(label = "%s")
-#                      MATCH a<-[:concepts]-b-[:concepts]->c
-#                      RETURN b, c;
-#                     """%request.GET["neighbor"]
-#                 data = gdb.query(q=query, returns=(Node, Node))
-#                 for d in data:
-#                     links.append({"type":d[0]["type"], "label":d[1]["label"]})
-#             sys.stderr.write("\nCypher: %s s\n"%t.secs)
-            
-            
+            results = concept.node_links(request.GET.get("type", None))
 
+        elif "search" in request.GET:
+            pass
+            ""
         else:
-            sys.stderr.write("debug0\n")
+            #Get random node, return node + x neigbours
             results = Concept.objects.all()
-            sys.stderr.write("debug1\n")
         
         return results
 
@@ -161,11 +138,11 @@ class ConceptResource(Resource):
             bundle.obj = Concept()
             bundle = self.full_hydrate(bundle)
             if bundle.obj.label is not None:
-                concept.label=bundle.obj.label
+                concept.label = bundle.obj.label
             if bundle.obj.description is not None:
-                concept.description=bundle.obj.description
+                concept.description = bundle.obj.description
             if bundle.obj.weight is not None:
-                concept.weight=bundle.obj.weight
+                concept.weight = bundle.obj.weight
             concept.save()
         except ObjectDoesNotExist:
             return self.obj_create(bundle, **kwargs)
@@ -189,14 +166,14 @@ class ConceptResource(Resource):
     def dehydrate(self, bundle):
         links = []
         gdb = GraphDatabase("http://localhost:7474/db/data/")
-        query="""START a = node:`kmap-Concept`(label = "%s")
+        query = """START a = node:`kmap-Concept`(label = "%s")
                  MATCH a<-[:concepts]-b-[:concepts]->c
                  RETURN b, c;
-                """%bundle.data["label"]
+                """ % bundle.data["label"]
         data = gdb.query(q=query, returns=(Node, Node))
-        for d in data:
-            links.append({"type":d[0]["type"], "label":d[1]["label"]})
-
+        for datum in data:
+            links.append({"type" : datum[0]["type"], 
+                          "label" : datum[1]["label"]})
 
         bundle.data["links"] = links
         return bundle
@@ -209,7 +186,8 @@ class LinkResource(Resource):
     link_type = fields.CharField(attribute='type', unique=False)
     weight = fields.IntegerField(attribute='weight', null=True, default=1)
 
-    concepts = fields.ToManyField(to='kmap.api.ConceptResource', attribute="concepts", null=True, blank=True)
+    concepts = fields.ToManyField(to='kmap.api.ConceptResource', 
+                                  attribute="concepts", null=True, blank=True)
     
     class Meta:
         resource_name = 'link'
@@ -243,10 +221,6 @@ class LinkResource(Resource):
             sys.stderr.write(repr(bundle_or_obj))
             kwargs['pk'] = bundle_or_obj[0].id
         
-#         if isinstance(bundle_or_obj, Bundle):
-#             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj.obj, self._meta.detail_uri_name)
-#         else:
-#             kwargs[self._meta.detail_uri_name] = getattr(bundle_or_obj, self._meta.detail_uri_name)
         return kwargs
 
     def get_object_list(self, request):
@@ -275,13 +249,12 @@ class LinkResource(Resource):
 
     def obj_get(self, bundle, **kwargs):
         sys.stderr.write("obj_get is called\n")
-        id = kwargs['pk']
-        sys.stderr.write("obj_get is called label:%s\n"%str(id))
-        resource = Link.objects.filter(id=id)
+        object_id = kwargs['pk']
+        sys.stderr.write("obj_get is called label:%s\n"%str(object_id))
+        resource = Link.objects.filter(id=object_id)
         sys.stderr.write("obj_get is called resource:%s\n"%type(resource))
         sys.stderr.write("obj_get is called prueba %s\n"% type(self._meta.object_class()))
         return resource[0]
-        return self.get_object_list(bundle.request)
         
     def obj_create(self, bundle, **kwargs):
         #creates an object
@@ -298,8 +271,8 @@ class LinkResource(Resource):
             new_link.concepts.add(concept1)
             new_link.weight = bundle.obj.weight
             new_link.save()
-        except Exception as e:
-            sys.stderr.write(str(e))
+        except Exception as exc:
+            sys.stderr.write(str(exc))
             return BadRequest
         
         return bundle
@@ -311,15 +284,15 @@ class LinkResource(Resource):
             bundle.obj = Link()
             bundle = self.full_hydrate(bundle)
             if bundle.obj.type is not None:
-                link.type=bundle.obj.type
+                link.type = bundle.obj.type
             if bundle.obj.concepts[0] is not None:
                 concept = Concept.objects.get(label=bundle.obj.concepts.all()[0])
-                link.concepts[0]=concept
+                link.concepts[0] = concept
             if bundle.obj.concepts[1] is not None:
                 concept = Concept.objects.get(label=bundle.obj.concepts.all()[1])
                 link.concepts[1] = concept
             if bundle.obj.weight is not None:
-                link.weight=bundle.obj.weight
+                link.weight = bundle.obj.weight
                 
             link.save()
         except ObjectDoesNotExist:
@@ -343,7 +316,7 @@ class LinkResource(Resource):
         pass
 
     def dehydrate(self, bundle):
-        concepts = []
+        
         for key in bundle.data:
             sys.stderr.write(str(bundle.data[key])+"\n")
         return bundle
