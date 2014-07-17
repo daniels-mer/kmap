@@ -113,8 +113,10 @@ class ConceptResource(Resource):
         resource = Concept.objects.filter(label__iexact=label)
         sys.stderr.write("obj_get is called resource:%s\n"%type(resource))
         sys.stderr.write("obj_get is called prueba %s\n"% type(self._meta.object_class()))
-        return resource[0] #Without the slice it returned a Queryset instead of a model, breaking the entire program
-
+        try:
+            return resource[0] #Without the slice it returned a Queryset instead of a model, breaking the entire program
+        except:
+            raise NotFound
     def obj_create(self, bundle, **kwargs): #POST
         #creates an object
         sys.stderr.write("obj_create is called \n")

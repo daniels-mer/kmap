@@ -1,12 +1,12 @@
-
-   {%load static%}
+{%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="stylesheet" type="text/css" href="{%static "styles/reset.css"%}">
     {%include "kmap/utils/standard_head.html"%}
-    <title>Navigate</title>
-    <script src="{%static "scripts/navigate.js"%}" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="{%static "styles/reset.css"%}">
+    <title>Kmap | Navigate</title>
+    
+    
     <link rel="stylesheet" type="text/css" href="{%static "styles/base.css"%}">
     <link rel="stylesheet" type="text/css" href="{%static "styles/navigate.css"%}">
 </head>
@@ -14,20 +14,25 @@
     
     <div class="wrapper">
         <div id="title">
-        <h2>Navigator:</h2>
+        <a href="{%url 'index'%}">Back</a>
+        <h2>Navigate</h2>
         </div>
         <div id="user-box">
             <div id="search-box">
-                <input type="text" id="search-text" placeholder="Search a concept"></input>
-                <button type="button" id="search-button">Search!</button>
+                <input type="text" id="search-text" class="form-control" placeholder="Search a concept"></input>
+                <button type="button" class="btn btn-default" id="search-button">Search!</button>
             </div>
             <div id="searching-box">Searching</div>
-            <div id="error-box">The concept has not been found</div>
+            <div id="error-box"><p>The concept has not been found</p></div>
+            <div id="results"></div>
         </div>
         <div id="canvas-div">
-        <canvas id="viewport" width="800px" height="800px"></canvas>
+            <canvas id="viewport"></canvas>
         </div>
     </div>
+    <script src="{%static "scripts/kmap.js"%}" type="text/javascript"></script>
+    <script src="{%static "scripts/navigate.js"%}" type="text/javascript"></script>
+    
 </body>
 </html>
 

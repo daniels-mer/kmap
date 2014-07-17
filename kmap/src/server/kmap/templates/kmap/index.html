@@ -1,24 +1,35 @@
+{%load static%}     
 <!DOCTYPE html>
 <html lang="en">
 <head>
     {%include "kmap/utils/standard_head.html"%}
-    <title></title>
+    <title>Kmap | Index</title>
+    <link type="text/css" rel="stylesheet" href="{%static "styles/index.css"%}"/>
 </head>
 <body>
     
-    <div class="wrapper">
-	    <div id="title">
-	    <h2>Welcome to Kmap, choose one option:</h2>
+    <div id="wrapper">
+    <div id="inner-wrapper">
+	    <div id="header">
+	       <h2>Kmap</h2>
 	    </div>
-        <div id="buttons">
-        <form action="{%url 'navigate'%}" method="GET">
-            <button>Navigate</button>
-        </form>
+        <div id="content">
+            <h1>Welcome to Kmap</h1>
+            <p>Kmap is an application for creating, editing and navigating concept maps.
+            The application is under constructions so some features may not be available</p>
+	        <form action="{%url 'navigate'%}" method="GET">
+	            <button  class="btn btn-default">Navigate</button>
+	        </form>
+	        
+	        <form action="{%url 'learn'%}" method="GET">
+	            <button type="button" class="btn btn-default">Learn</button>
+	        </form>
+        </div>
+        <div id="footer">
+            <p>See the code in <a href="https://github.com/daniels-mer/kmap">github</a>  </p>      
         
-        <form action="{%url 'learn'%}" method="GET">
-            <button>Learn</button>
-        </form>
-        </div> 
+        </div>
+    </div>
     </div>
 </body>
 </html>
